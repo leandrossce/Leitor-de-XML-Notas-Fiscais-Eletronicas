@@ -5,6 +5,33 @@ import pandas as pd
 
 produtos = {}
 
+
+
+def retornar_valor_total_itens(caminho):
+    valor_total_itens=0	
+
+    # Defina o namespace
+    namespace = {'nfe': 'http://www.portalfiscal.inf.br/nfe'}
+
+    # Carregue o arquivo XML
+    tree = ET.parse(caminho)
+
+    # Obtenha o elemento raiz
+    root = tree.getroot()
+
+    notafiscal= root.find('.//nfe:ide', namespace)
+
+    # Exemplo para extrair informações do produto:
+    det = root.findall('.//nfe:det', namespace)
+   
+    for items_det in det:
+        #valor_total_itens = 
+        valor_em_texto=float(items_det.find('./nfe:prod/nfe:vProd', namespace).text)
+        valorTotal=float(valor_em_texto)
+        valor_total_itens = valorTotal+valor_total_itens
+		
+    return valor_total_itens
+
 def inserir_produto(nome, codigo, data, undMedida, vrUnitario,qtdItem,fornecedor,cnpj,custoTotalItem,NFE,CHAVE):
     if nome not in produtos:
         produtos[nome] = []
@@ -18,10 +45,15 @@ def inserir_produto(nome, codigo, data, undMedida, vrUnitario,qtdItem,fornecedor
                             "cnpj":cnpj,
                             "custo": custoTotalItem,
                             "NFE":NFE,
-                            "CHAVE":CHAVE                        
+                            "CHAVE":CHAVE
                             })
-    
+
+
 def leituraXML(caminho):
+	#total somado dos valores dos itens
+    somaTotalItensNota=0
+    somaTotalItensNota=retornar_valor_total_itens(caminho)
+	
     # Defina o namespace
     namespace = {'nfe': 'http://www.portalfiscal.inf.br/nfe'}
 
@@ -49,25 +81,25 @@ def leituraXML(caminho):
 
         else:
             if (valorLiquidoNotaFiscal==""):
-                totalLiquidoNota= root.find('.//nfe:detPag', namespace)           
-                valorLiquidoNotaFiscal = totalLiquidoNota.find('./nfe:vPag', namespace).text   
+                totalLiquidoNota= root.find('.//nfe:detPag', namespace)
+                valorLiquidoNotaFiscal = totalLiquidoNota.find('./nfe:vPag', namespace).text
             if(valorLiquidoNotaFiscal=="0.00" or valorLiquidoNotaFiscal=="0"):
-                valorLiquidoNotaFiscal=ICMSTot.find('./nfe:vNF', namespace).text #evita erros na gravação                
-                #print("AAqui!-> " + valorLiquidoNotaFiscal) 
+                valorLiquidoNotaFiscal=ICMSTot.find('./nfe:vNF', namespace).text #evita erros na gravação
+                #print("AAqui!-> " + valorLiquidoNotaFiscal)
     except:
 
-        try: 
-            totalLiquidoNota= root.find('.//nfe:pag', namespace)           
-            valorLiquidoNotaFiscal = totalLiquidoNota.find('nfe:vPag', namespace).text 
-    
+        try:
+            totalLiquidoNota= root.find('.//nfe:pag', namespace)
+            valorLiquidoNotaFiscal = totalLiquidoNota.find('nfe:vPag', namespace).text
+
         except:
             valorLiquidoNotaFiscal=ICMSTot.find('./nfe:vNF', namespace).text #evita erros na gravação
-            pass    
+            pass
 
-   
-    
+
+
 #   ICMSTot = root.find('.//nfe:ICMSTot', namespace)
-    
+
 
     vBC= 0 #evita erros na gravação
     vICMS= 0  #evita erros na gravação
@@ -97,7 +129,7 @@ def leituraXML(caminho):
             #print("ok1")
             vICMS= ICMSTot.find('./nfe:vICMS', namespace).text  #evita erros na gravação
             #print("ok2")
-            vICMSDeson= 0# ICMSTot.find('./nfe:vICMSDeson', namespace).text #evita erros na gravação
+            vICMSDeson= ICMSTot.find('./nfe:vICMSDeson', namespace).text #evita erros na gravação
             #print("ok3")
             vFCPUFDest=0 # ICMSTot.find('./nfe:vFCPUFDest', namespace).text  #evita erros na gravação
             #print("ok4")
@@ -111,7 +143,8 @@ def leituraXML(caminho):
             #print("ok8")
             vST= ICMSTot.find('./nfe:vST', namespace).text #evita erros na gravação
             #print("ok9")
-            vFCPST= 0# ICMSTot.find('./nfe:vFCPST', namespace).text #evita erros na gravação
+            			
+            vFCPST= ICMSTot.find('./nfe:vFCPST', namespace).text #evita erros na gravação
             #print("ok10")
             vFCPSTRet= ICMSTot.find('./nfe:vFCPSTRet', namespace).text #evita erros na gravação
             #print("ok11")
@@ -142,7 +175,7 @@ def leituraXML(caminho):
 
     icms60 = root.find('.//nfe:ICMS60', namespace)
     # Se o elemento ICMS60 foi encontrado, extrair os valores desejados
-    
+
     vBCSTRet = 0           #evita erros na gravação do excel
     pST = 0                 #evita erros na gravação do excel
     vICMSSubstituto = 0     #evita erros na gravação do excel
@@ -150,79 +183,79 @@ def leituraXML(caminho):
     pRedBCEfet= 0           #evita erros na gravação do excel
     vBCEfet= 0              #evita erros na gravação do excel
     pICMSEfet= 0          #evita erros na gravação do excel
-    vICMSEfet = 0           #evita erros na gravação do excel  
+    vICMSEfet = 0           #evita erros na gravação do excel
     cst60=0
-    
+
 
     icms40 = root.find('.//nfe:ICMS40', namespace)
     cst40=""
-    
-    chave_nfe=""    #evita erros na gravação do excel   
+
+    chave_nfe=""    #evita erros na gravação do excel
 
     chave_nota_fiscal=root.find('.//nfe:protNFe/nfe:infProt', namespace)
-     
+
     try:
         if chave_nota_fiscal is not None:
-            chave_nfe = chave_nota_fiscal.find('nfe:chNFe', namespace).text    
+            chave_nfe = chave_nota_fiscal.find('nfe:chNFe', namespace).text
     except:
         pass
-     
-    num_nota_fiscal=""    #evita erros na gravação do excel   
+
+    num_nota_fiscal=""    #evita erros na gravação do excel
     data_entrada_saida=""
-    
+
     try:
         if notafiscal is not None:
             num_nota_fiscal = notafiscal.find('nfe:nNF', namespace).text
-            data_entrada_saida=(notafiscal.find('nfe:dhEmi', namespace).text)[:10] 
+            data_entrada_saida=(notafiscal.find('nfe:dhEmi', namespace).text)[:10]
     except:
         try:
             data_entrada_saida=(notafiscal.find('nfe:dhSaiEnt', namespace).text)[:10]
-                   
+
         except:
 
             pass
-            
-    nome_emitente=""    #evita erros na gravação do excel   
-    cnpj_emitente=""    #evita erros na gravação do excel 
 
-    try:    
+    nome_emitente=""    #evita erros na gravação do excel
+    cnpj_emitente=""    #evita erros na gravação do excel
+
+    try:
         if emitente is not None:
             nome_emitente = emitente.find('nfe:xNome', namespace).text
             try:
                 cnpj_emitente ="'"+ emitente.find('nfe:CNPJ', namespace).text
             except:
-                cnpj_emitente ="'"+ emitente.find('nfe:CPF', namespace).text 
+                cnpj_emitente ="'"+ emitente.find('nfe:CPF', namespace).text
 
-                 
+
             #print(f'Nome do Emitente: {nome_emitente}')
     except:
         pass
-  
+
     destinatario = root.find('.//nfe:dest', namespace)
 
-    nome_destinatario=""    #evita erros na gravação do excel 
+    nome_destinatario=""    #evita erros na gravação do excel
 
 
     # Exemplo para extrair informações do produto:
     det = root.findall('.//nfe:det', namespace)
     codigo_produto=""
-    vDescItem= 0#evita erros na gravação    
-    NCM =""    #evita erros na gravação do excel 
-    CFOP=""    #evita erros na gravação do excel 
-    unidadeMedida=""    #evita erros na gravação do excel 
-    qtd=0    #evita erros na gravação do excel 
-    valorUnitario =0    #evita erros na gravação do excel 
-    valor =0    #evita erros na gravação do excel 
-    ICMS00=""    #evita erros na gravação do excel 
-    ICMS10=""    #evita erros na gravação do excel 
-    ICMS20=""    #evita erros na gravação do excel 
-    ICMS30=""    #evita erros na gravação do excel 
-    ICMS40=""    #evita erros na gravação do excel 
-    ICMS41=""    #evita erros na gravação do excel 
-    ICMS50=""    #evita erros na gravação do excel 
-    ICMS51=""    #evita erros na gravação do excel 
-    ICMS70=""    #evita erros na gravação do excel 
-    ICMS90=""    #evita erros na gravação do excel 
+    vDescItem= 0#evita erros na gravação
+    NCM =""    #evita erros na gravação do excel
+    CFOP=""    #evita erros na gravação do excel
+    unidadeMedida=""    #evita erros na gravação do excel
+    qtd=0    #evita erros na gravação do excel
+    valorUnitario =0    #evita erros na gravação do excel
+    valor =0    #evita erros na gravação do excel
+    ICMS00=""    #evita erros na gravação do excel
+    ICMS10=""    #evita erros na gravação do excel
+    ICMS20=""    #evita erros na gravação do excel
+    ICMS30=""    #evita erros na gravação do excel
+    ICMS40=""    #evita erros na gravação do excel
+    ICMS41=""    #evita erros na gravação do excel
+    ICMS50=""    #evita erros na gravação do excel
+    ICMS51=""    #evita erros na gravação do excel
+    ICMS70=""    #evita erros na gravação do excel
+    ICMS90=""    #evita erros na gravação do excel
     ICMSST=""
 
 
@@ -230,16 +263,16 @@ def leituraXML(caminho):
     vIPI_arredondado = float(vIPI)#NECESSARIO MANTER ESSE ESCOPO PARA NAO PERDER O TOTAL VIPI_VST
     VIPIVST= vST_arredondado+vIPI_arredondado   #NECESSARIO MANTER ESSE ESCOPO PARA NAO PERDER O TOTAL VIPI_VST
     vDescItemProporcional=0             #NECESSARIO MANTER ESSE ESCOPO PARA NAO PERDER O TOTAL VIPI_VST
-    
-    for items_det in det:
+
+    for items_det in det:			#OBS: frete geralmente só aparece 1 vez...ao percorrer os itens a informacao pode ser zerada (frete)
         #print (det)
-        
+
         NCM = items_det.find('./nfe:prod/nfe:NCM', namespace)
         try:
             vDescItem=items_det.find  ('./nfe:prod/nfe:vDesc', namespace).text
         except:
             vDescItem=0
-        descricao = items_det.find('./nfe:prod/nfe:xProd', namespace).text.replace('\n', '').replace(';', '')   
+        descricao = items_det.find('./nfe:prod/nfe:xProd', namespace).text.replace('\n', '').replace(';', '')
         CFOP= items_det.find('./nfe:prod/nfe:CFOP', namespace).text
         unidadeMedida= items_det.find('./nfe:prod/nfe:uCom', namespace).text
         qtd= items_det.find('./nfe:prod/nfe:qCom', namespace).text
@@ -254,7 +287,7 @@ def leituraXML(caminho):
         './nfe:imposto/nfe:ICMS/nfe:ICMS90/nfe:CST',
         './nfe:imposto/nfe:ICMS/nfe:ICMSST/nfe:CST',
         './nfe:imposto/nfe:ICMS/nfe:ICMS20/nfe:CST',
-        './nfe:imposto/nfe:ICMS/nfe:ICMS10/nfe:CST',        
+        './nfe:imposto/nfe:ICMS/nfe:ICMS10/nfe:CST',
         './nfe:imposto/nfe:ICMS/nfe:ICMS30/nfe:CST',
         './nfe:imposto/nfe:ICMS/nfe:ICMSSN101/nfe:CSOSN',
         './nfe:imposto/nfe:ICMS/nfe:ICMSSN102/nfe:CSOSN',
@@ -278,16 +311,52 @@ def leituraXML(caminho):
             print("Não localizado o CST/CSOSN corrija!!!.")
 
 
+
+        #vICMSDeson (vICMSDeson) adicionado em 18-10-2024
+        paths = [
+        './nfe:imposto/nfe:ICMS/nfe:ICMS60/nfe:vICMSDeson',
+        './nfe:imposto/nfe:ICMS/nfe:ICMS40/nfe:vICMSDeson',
+        './nfe:imposto/nfe:ICMS/nfe:ICMS70/nfe:vICMSDeson',
+        './nfe:imposto/nfe:ICMS/nfe:ICMS90/nfe:vICMSDeson',
+        './nfe:imposto/nfe:ICMS/nfe:ICMSST/nfe:vICMSDeson',
+        './nfe:imposto/nfe:ICMS/nfe:ICMS20/nfe:vICMSDeson',
+        './nfe:imposto/nfe:ICMS/nfe:ICMS10/nfe:vICMSDeson',
+        './nfe:imposto/nfe:ICMS/nfe:ICMS30/nfe:vICMSDeson',
+        './nfe:imposto/nfe:ICMS/nfe:ICMSSN101/nfe:vICMSDeson',
+        './nfe:imposto/nfe:ICMS/nfe:ICMSSN102/nfe:vICMSDeson',
+        './nfe:imposto/nfe:ICMS/nfe:ICMSSN201/nfe:vICMSDeson',
+        './nfe:imposto/nfe:ICMS/nfe:ICMSSN500/nfe:vICMSDeson',
+        './nfe:imposto/nfe:ICMS/nfe:ICMSSN900/nfe:vICMSDeson',
+        './nfe:imposto/nfe:ICMS/nfe:ICMS00/nfe:vICMSDeson',
+        './nfe:imposto/nfe:ICMS/nfe:ICMS61/nfe:vICMSDeson'
+]
+        vICMSDeson = ""
+        for path in paths:
+            try:
+                vICMSDeson = items_det.find(path, namespace).text
+                break
+            except:
+                continue
+
+			
+
+
+
+
+
+
         if NCM is not None:
             pass
 
-        try: 
+        try:
 
             valorUnd=float(valorUnitario)
             valorUnd=str(valorUnd).replace('.',',')
             qtdItens=float(qtd)
             qtdItens=str(qtdItens).replace('.',',')
             vrTotalItens=float(valor)
+			
+		
 
             vrLiquidoNotaFiscal=float(valorLiquidoNotaFiscal)
             vrLiquidoNotaFiscal=str(vrLiquidoNotaFiscal).replace('.',',')
@@ -301,61 +370,102 @@ def leituraXML(caminho):
 
             ipiRateadoItem=float(ipiRateadoItem)
             ipiRateadoItem=str(ipiRateadoItem).replace('.',',')
-            
+
             vrTotalItens=str(vrTotalItens).replace('.',',')
 
-
-            
+            if(float(vFCPST)>0):		#fcop (vFCPST) adicionado em 18-10-2024
+                vFCPST=float(vFCPST)
+                #vFCPST=str(vFCPST).replace('.',',')
+            else:
+                vFCPST=0	
+            try:			
+                if(float(vICMSDeson)>0):		#vICMSDeson (vICMSDeson) adicionado em 18-10-2024
+                    vICMSDeson=float(vICMSDeson)
+                #vFCPST=str(vFCPST).replace('.',',')
+                else:
+                    vICMSDeson=0
+            except:
+                vICMSDeson=0
+                pass
+				
+				
+			
             if(float(vDesc)>0):
-                descontoRateaItem= (float(vDesc)/float(vProdTOTAL))* float(valor) 
+                descontoRateaItem= (float(vDesc)/somaTotalItensNota)* float(valor)
                 descontoRateaItem=descontoRateaItem
                 descontoRateaItem="-" + str(descontoRateaItem)
-                descontoRateaItem=str(descontoRateaItem).replace('.',',')                
-            
+                descontoRateaItem=str(descontoRateaItem).replace('.',',')
+				
+                #descontoRateaItem= (float(vDesc)/float(vProdTOTAL))* float(valor)
+                #descontoRateaItem=descontoRateaItem
+                #descontoRateaItem="-" + str(descontoRateaItem)
+                #descontoRateaItem=str(descontoRateaItem).replace('.',',')
+				
+
             else:
                 descontoRateaItem=0
-            
+
             if(float(vFrete)>0):
-                freteRateado= (float(vFrete)/float(vProdTOTAL))* float(valor) 
+                freteRateado= (float(vFrete)/somaTotalItensNota)* float(valor)
                 freteRateado=freteRateado
-                freteRateado=str(freteRateado).replace('.',',')                
+                freteRateado=str(freteRateado).replace('.',',')
+				
+                #freteRateado= (float(vFrete)/float(vProdTOTAL))* float(valor)
+                #freteRateado=freteRateado
+                #freteRateado=str(freteRateado).replace('.',',')				
             
             else:
                 freteRateado=0
+				
+			
 
 
-            
+
             if(float(vOutro)>0):
-                outrasDespesas= (float(vOutro)/float(vProdTOTAL))* float(valor) 
+                outrasDespesas= (float(vOutro)/float(vProdTOTAL))* float(valor)
                 outrasDespesas=outrasDespesas
-                outrasDespesas=str(outrasDespesas).replace('.',',')                
-            
+                outrasDespesas=str(outrasDespesas).replace('.',',')
+
             else:
                 outrasDespesas=0
 
 
 
             if(float(vSeg)>0):
-                seguroRateado= (float(vSeg)/float(vProdTOTAL))* float(valor) 
+                seguroRateado= (float(vSeg)/float(vProdTOTAL))* float(valor)
                 seguroRateado=seguroRateado
-                seguroRateado=str(seguroRateado).replace('.',',')                
-            
+                seguroRateado=str(seguroRateado).replace('.',',')
+
             else:
                 seguroRateado=0
 
             #totalização custo final
-            custoTotaldoItem= float(valor)+ ((float(vFrete)/float(vProdTOTAL))* float(valor) ) + ((vIPI_arredondado/float(vProdTOTAL)) * float(valor) ) + ((vST_arredondado/float(vProdTOTAL)) * float(valor)) - ((float(vDesc)/float(vProdTOTAL))* float(valor)) +(float(vOutro)/float(vProdTOTAL))* float(valor) 
+            custoTotaldoItem= vFCPST - vICMSDeson+  float(valor)+ ((float(vFrete)/float(vProdTOTAL))* float(valor) ) + ((vIPI_arredondado/float(vProdTOTAL)) * float(valor) ) + ((vST_arredondado/float(vProdTOTAL)) * float(valor)) - ((float(vDesc)/float(vProdTOTAL))* float(valor)) +(float(vOutro)/float(vProdTOTAL))* float(valor)
+			
+            if(float(vFCPST)>0):		#fcop (vFCPST) adicionado em 18-10-2024
+                vFCPST=float(vFCPST)
+                vFCPST=str(vFCPST).replace('.',',') #para gravar corretamente no excel (valor somável)
+            else:
+                vFCPST=0
+				
+            if(float(vICMSDeson)>0):		#vICMSDeson (vICMSDeson) adicionado em 18-10-2024
+                vICMSDeson=float(vICMSDeson)
+                vICMSDeson="-"+str(vICMSDeson).replace('.',',')
+            else:
+                vICMSDeson=0				
+				
+			
             float_custoTotaldoItem=custoTotaldoItem
             custoTotaldoItem=custoTotaldoItem
-            custoTotaldoItem=str(custoTotaldoItem).replace('.',',')     
+            custoTotaldoItem=str(custoTotaldoItem).replace('.',',')
 
 
             aliquota=calcular_porcentagem(float(cst60))
             aliquota= float(aliquota)
 
             imposto = aliquota*float_custoTotaldoItem
-            
-            imposto=str(imposto).replace('.',',')   
+
+            imposto=str(imposto).replace('.',',')
 
             writer.writerow([nome_emitente,
                             cnpj_emitente,
@@ -366,13 +476,15 @@ def leituraXML(caminho):
                             unidadeMedida,
                             vrTotalItens, #valor total dos itens
                             rateioIcmsPorItem,    #icms substituição rateado
+							vFCPST,
+                            vICMSDeson,							
                             ipiRateadoItem,        #ipi individual
                             descontoRateaItem,  #desconto item
                             seguroRateado,    #valor seguro
                             freteRateado,     #valor freteF                            custoTotaldoItem, #custo total do item
                             outrasDespesas,
                             custoTotaldoItem,
-                            cst60, 
+                            cst60,
                             CFOP,
                             NCM.text,
                             num_nota_fiscal,
@@ -382,7 +494,7 @@ def leituraXML(caminho):
                             data_entrada_saida,
                             "'"+ chave_nfe,
                             vBCSTRet,pST,vICMSSubstituto,vICMSSTRet,pRedBCEfet,vBCEfet,pICMSEfet,vICMSEfet])
-            
+
             print(f"Nota fiscal chave {chave_nfe} processada e ok!")
 
 
@@ -394,8 +506,8 @@ def leituraXML(caminho):
             pRedBCEfet= ""           #evita erros na gravação do excel
             vBCEfet= 0              #evita erros na gravação do excel
             pICMSEfet= ""            #evita erros na gravação do excel
-            vICMSEfet = ""           #evita erros na gravação do excel  
-            cst60=""     
+            vICMSEfet = ""           #evita erros na gravação do excel
+            cst60=""
             vBC= 0 #evita erros na gravação
             vICMS= 0  #evita erros na gravação
             vICMSDeson= 0 #evita erros na gravação
@@ -408,7 +520,7 @@ def leituraXML(caminho):
             vFCPST= 0#evita erros na gravação
             vFCPSTRet= 0#evita erros na gravação
             vProd= 0#evita erros na gravação
-            vFrete= 0#evita erros na gravação
+            #vFrete= 0#evita erros na gravação			comentado em 18/10/2024
             #vSeg= 0#evita erros na gravação
             #vDesc= 0#evita erros na gravação
             vDescItem= 0#evita erros na gravação
@@ -418,17 +530,17 @@ def leituraXML(caminho):
             vPIS= 0#evita erros na gravação
             vCOFINS= 0#evita erros na gravação
             #vOutro   = 0#evita erros na gravação
-            ICMS00=""    #evita erros na gravação do excel 
-            ICMS10=""    #evita erros na gravação do excel 
-            ICMS20=""    #evita erros na gravação do excel 
-            ICMS30=""    #evita erros na gravação do excel 
-            ICMS40=""    #evita erros na gravação do excel 
-            ICMS41=""    #evita erros na gravação do excel 
-            ICMS50=""    #evita erros na gravação do excel 
-            ICMS51=""    #evita erros na gravação do excel 
-            ICMS70=""    #evita erros na gravação do excel 
-            ICMS90=""    #evita erros na gravação do excel 
-            ICMSST=""        
+            ICMS00=""    #evita erros na gravação do excel
+            ICMS10=""    #evita erros na gravação do excel
+            ICMS20=""    #evita erros na gravação do excel
+            ICMS30=""    #evita erros na gravação do excel
+            ICMS40=""    #evita erros na gravação do excel
+            ICMS41=""    #evita erros na gravação do excel
+            ICMS50=""    #evita erros na gravação do excel
+            ICMS51=""    #evita erros na gravação do excel
+            ICMS70=""    #evita erros na gravação do excel
+            ICMS90=""    #evita erros na gravação do excel
+            ICMSST=""
 
             inserir_produto(descricao,codigo_produto, data_entrada_saida,unidadeMedida,valorUnd, qtdItens,nome_emitente,cnpj_emitente, custoTotaldoItem,num_nota_fiscal,chave_nfe)
 
@@ -443,8 +555,8 @@ def leituraXML(caminho):
                 print("Descrição do erro: {e}")
                 print("pressione Enter para continuar...")
                 y=input()
-    
-       
+
+
 
 def calcular_porcentagem(valor):
     if round(valor,0) == 0:
@@ -477,12 +589,12 @@ def ler_todos_arquivos_xml(diretorio):
 
 def sanitize_filename(filename):
     # Lista de caracteres inválidos
-    invalid_chars = '<>:"/\|?*'
-    
+    invalid_chars = '<>:"/\\|?*'
+
     # Elimina cada caractere inválido da string
     for char in invalid_chars:
         filename = filename.replace(char, '')
-    
+
     # Remove caracteres ASCII de controle
     filename = ''.join(ch for ch in filename if 31 < ord(ch) < 127 or ch in ('\t', '\n', '\r'))
 
@@ -490,10 +602,10 @@ def sanitize_filename(filename):
     reserved_names = ['CON', 'PRN', 'AUX', 'NUL', 'COM1', 'COM2', 'COM3', 'COM4', 'COM5', 'COM6', 'COM7', 'COM8', 'COM9', 'LPT1', 'LPT2', 'LPT3', 'LPT4', 'LPT5', 'LPT6', 'LPT7', 'LPT8', 'LPT9']
     if filename.upper() in reserved_names:
         filename = '_' + filename
-    
+
     # Evita espaços no início e no final do nome do arquivo
     filename = filename.strip()
-    
+
     return filename
 
 def graficoCustoProduto(produto):
@@ -532,13 +644,13 @@ def graficoCustoProduto(produto):
         plt.grid(True)
         plt.tight_layout()
 
-        
-        plt.savefig("C:\\Users\\Gabriel\\Desktop\\chromedriver_win32\\testexml\\graficos\\"+produto+".png", dpi=300, bbox_inches="tight")
+
+        plt.savefig("D:\\"+produto+".png", dpi=300, bbox_inches="tight")
     except:
         print("Erro ao gravar imagem do gráfico")
 
 
-    
+
 def calcular_variacao(valor_anterior, valor_atual):
     return ((valor_atual - valor_anterior) / valor_anterior) * 100
 
@@ -551,18 +663,18 @@ def variacoesCincoPorcento():
     for produto, ocorrências in produtos.items():
         # Filtra as ocorrências para excluir o fornecedor especificado
         ocorrências_filtradas = [ocorr for ocorr in ocorrências if ocorr["fornecedor"] != excluir_fornecedor]
-        
+
         ocorrências_filtradas = sorted(ocorrências_filtradas, key=lambda x: x['data'])  # Ordena as ocorrências filtradas pela data
-        
+
         for i in range(1, len(ocorrências_filtradas)):
             valor_anterior = ocorrências_filtradas[i-1]['valorUnitario']
             valor_atual = ocorrências_filtradas[i]['valorUnitario']
 
             valor_anterior=valor_anterior.replace(",",".")
             valor_atual=valor_atual.replace(",",".")
-            
+
             variacao = calcular_variacao(float(valor_anterior), float(valor_atual))
-            
+
             if abs(variacao) > 5:  # Variação (positiva ou negativa) acima de 5%
                 if produto not in produtos_variacao_acima_5:
                     produtos_variacao_acima_5[produto] = []
@@ -582,30 +694,37 @@ def variacoesCincoPorcento():
     df = pd.DataFrame(records)
 
     # Grave o DataFrame em um arquivo Excel
-    df.to_excel("C:\\produtos_variacao_acima_5.xlsx", index=False, engine='openpyxl')
+    df.to_excel("D:\\produtos_variacao_acima_5.xlsx", index=False, engine='openpyxl')
 
 
 
-caminhoListaEmpresas='C:\\Users\\Gabriel\\Desktop\\chromedriver_win32\\leitorXML4.0\\empresas.csv'  # O ARQUIVO empresas.CSV tem que ficar no mesmo diretório do scritp lendoXMLCompleto4.0.py
+caminhoListaEmpresas='C:\\Users\\leandro\\Downloads\\Agroveterinaria Entradas 01 a 092024\\empresas.csv'  # O ARQUIVO empresas.CSV tem que ficar no mesmo diretório do scritp lendoXMLCompleto4.0.py
                                                                                                     # Nesse arquivo é para constar a origem dos arquivos XML e o destino do relatório que será salvo
 
-with open(caminhoListaEmpresas) as f:
+import chardet
+
+with open('C:\\Users\\leandro\\Downloads\\Agroveterinaria Entradas 01 a 092024\\empresas.csv', 'rb') as file:
+    raw_data = file.read(10000)  # Ler os primeiros 10000 bytes para detectar a codificação
+    result = chardet.detect(raw_data)
+    encoding = result['encoding']
+
+with open(caminhoListaEmpresas,encoding=encoding) as f:
     next(f)        #pula o cabeçalho
-    
+
     for line in f:
-        
+
         line=line.strip()
         line=line.split(";")
-        
+
         origem= line[1]
         destino=line[2]
 
         try:
 
-            with open(destino, mode='w', newline='') as file:
+            with open(destino, mode='w', newline='',encoding=encoding) as file:
                 # Cria um objeto writer para escrever no arquivo CSV
                 writer = csv.writer(file, delimiter=';')
-                writer.writerow(["FORNECEDOR","CNPJ/CPF","CODIGO PROD.", "DESCRICAO", "VR. UNITARIO", "QTD","UN.MEDIDA", "VR. TOTAL","ICMS SUBSTITUIÇÃO","IPI","DESCONTO","SEGURO","FRETE","OUTRAS DESPESAS","CUSTO DO ITEM","CST","CFOP","NCM","NFE","ALIQUOTA","IMPOSTO","VR. LIQ. NFE","DATA ENTRADA","CHAVE ELETRONICA","vBCSTRet","pST","vICMSSubstituto","vICMSSTRet","pRedBCEfet","vBCEfet","pICMSEfet","vICMSEfet"])
+                writer.writerow(["FORNECEDOR","CNPJ/CPF","CODIGO PROD.", "DESCRICAO", "VR. UNITARIO", "QTD","UN.MEDIDA", "VR. TOTAL","ICMS SUBSTITUIÇÃO","FCOP","vICMSDeson","IPI","DESCONTO","SEGURO","FRETE","OUTRAS DESPESAS","CUSTO DO ITEM","CST","CFOP","NCM","NFE","ALIQUOTA","IMPOSTO","VR. LIQ. NFE","DATA ENTRADA","CHAVE ELETRONICA","vBCSTRet","pST","vICMSSubstituto","vICMSSTRet","pRedBCEfet","vBCEfet","pICMSEfet","vICMSEfet"])
                 ler_todos_arquivos_xml(origem)
         except:
             print("Final da lista. Caso o resultado não esteja ok, verifique os caminhos constantes no arquivo empresas.csv!")
