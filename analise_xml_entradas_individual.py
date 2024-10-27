@@ -20,7 +20,7 @@ def selecionar_caminho_xml():
     entrada_btn_arquivo.insert(0, origem)
 
 def selecionar_caminho_relatorio():
-    destino = filedialog.asksaveasfilename(defaultextension=".xlsx", filetypes=[("Excel files", "*.xlsx")], title="Nomeie o arquivo para salvar o relatório")
+    destino = filedialog.asksaveasfilename(defaultextension=".csv", filetypes=[("Excel files", "*.csv")], title="Nomeie o arquivo para salvar o relatório")
     entrada_btn_arquivo2.delete(0, tk.END)
     entrada_btn_arquivo2.insert(0, destino)
 
@@ -727,8 +727,8 @@ def executar():
         messagebox.showwarning("Atenção", "Por favor, preencha todos os campos.")
         return
 
-    if not destino.lower().endswith('.xlsx'):
-        messagebox.showwarning("Atenção", "O arquivo do relatório resumido deve ter a extensão '.xlsx'.")
+    if not destino.lower().endswith('.csv'):
+        messagebox.showwarning("Atenção", "O arquivo do relatório resumido deve ter a extensão '.csv'.")
         return
 
 
@@ -755,7 +755,7 @@ def executar():
 
 # Criação da janela principal
 janela = tk.Tk()
-janela.title("Processamento de Vendas - Cupom Eletrônico")
+janela.title("Processamento XML - Documentos de entrada")
 
 
 # Bloquear a janela para que não possa ser maximizada
@@ -802,7 +802,7 @@ btn_arquivo = tk.Button(janela, text="Selecionar", command=selecionar_caminho_xm
 btn_arquivo.grid(row=0, column=2, padx=10, pady=5)
 
 
-tk.Label(janela, text="Arquivo para salvar o relatório resumido (.xlsx):").grid(row=1, column=0, padx=10, pady=5, sticky='e')
+tk.Label(janela, text="Arquivo para salvar o relatório resumido (.csv):").grid(row=1, column=0, padx=10, pady=5, sticky='e')
 entrada_btn_arquivo2 = tk.Entry(janela, width=50)
 entrada_btn_arquivo2.grid(row=1, column=1, padx=10, pady=5)
 btn_arquivo2 = tk.Button(janela, text="Selecionar", command=selecionar_caminho_relatorio)
