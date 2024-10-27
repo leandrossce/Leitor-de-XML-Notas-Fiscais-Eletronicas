@@ -293,6 +293,7 @@ def executar():
 
             paths = [
             './nfe:imposto/nfe:ICMS/nfe:ICMS60/nfe:CST',
+            './nfe:imposto/nfe:ICMS/nfe:ICMS51/nfe:CST',            
             './nfe:imposto/nfe:ICMS/nfe:ICMS40/nfe:CST',
             './nfe:imposto/nfe:ICMS/nfe:ICMS70/nfe:CST',
             './nfe:imposto/nfe:ICMS/nfe:ICMS90/nfe:CST',
@@ -302,7 +303,12 @@ def executar():
             './nfe:imposto/nfe:ICMS/nfe:ICMS30/nfe:CST',
             './nfe:imposto/nfe:ICMS/nfe:ICMSSN101/nfe:CSOSN',
             './nfe:imposto/nfe:ICMS/nfe:ICMSSN102/nfe:CSOSN',
+            './nfe:imposto/nfe:ICMS/nfe:ICMSSN103/nfe:CSOSN',
+            './nfe:imposto/nfe:ICMS/nfe:ICMSSN202/nfe:CSOSN',                        
             './nfe:imposto/nfe:ICMS/nfe:ICMSSN201/nfe:CSOSN',
+            './nfe:imposto/nfe:ICMS/nfe:ICMSSN203/nfe:CSOSN',          
+            './nfe:imposto/nfe:ICMS/nfe:ICMSSN300/nfe:CSOSN',              
+            './nfe:imposto/nfe:ICMS/nfe:ICMSSN400/nfe:CSOSN',            
             './nfe:imposto/nfe:ICMS/nfe:ICMSSN500/nfe:CSOSN',
             './nfe:imposto/nfe:ICMS/nfe:ICMSSN900/nfe:CSOSN',
             './nfe:imposto/nfe:ICMS/nfe:ICMS00/nfe:CST',
@@ -451,7 +457,7 @@ def executar():
                     seguroRateado=0
 
                 #totalização custo final
-                custoTotaldoItem= vFCPST - vICMSDeson+  float(valor)+ ((float(vFrete)/float(vProdTOTAL))* float(valor) ) + ((vIPI_arredondado/float(vProdTOTAL)) * float(valor) ) + ((vST_arredondado/float(vProdTOTAL)) * float(valor)) - ((float(vDesc)/float(vProdTOTAL))* float(valor)) +(float(vOutro)/float(vProdTOTAL))* float(valor)
+                custoTotaldoItem= vFCPST +  float(valor)+ ((float(vFrete)/float(vProdTOTAL))* float(valor) ) + ((vIPI_arredondado/float(vProdTOTAL)) * float(valor) ) + ((vST_arredondado/float(vProdTOTAL)) * float(valor)) - ((float(vDesc)/float(vProdTOTAL))* float(valor)) +(float(vOutro)/float(vProdTOTAL))* float(valor)
                 
                 if(float(vFCPST)>0):		#fcop (vFCPST) adicionado em 18-10-2024
                     vFCPST=float(vFCPST)
