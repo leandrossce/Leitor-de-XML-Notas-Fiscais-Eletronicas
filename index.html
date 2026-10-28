@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="color-scheme" content="light" />
+  <title>Analisador de Pagamentos e DANFE PDF • NF-e modelo 55</title>
+  <style>
+    :root{--navy:#12243b;--blue:#285ddb;--blue-light:#edf2ff;--ink:#1b2a42;--muted:#687990;--line:#dee6f0;--bg:#f4f7fb;--white:#fff;--success:#146c4e;--warn:#966011;--danger:#ab3846;--shadow:0 12px 35px rgba(25,48,89,.055)}
+    *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.55 Inter,system-ui,-apple-system,"Segoe UI",Arial,sans-serif}button,input,textarea,select{font:inherit}button{cursor:pointer}button:disabled{opacity:.52;cursor:not-allowed}a{color:var(--blue)}.shell{max-width:1540px;margin:auto;padding:27px 30px 60px}
+    header{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:23px}.brand{display:flex;align-items:center;gap:13px}.mark{background:var(--navy);color:white;display:grid;place-items:center;width:47px;height:47px;border-radius:14px;font-size:23px;font-weight:900}.eyebrow{color:var(--blue);font-weight:800;letter-spacing:.1em;font-size:10px;text-transform:uppercase}h1{font-size:24px;line-height:1.2;letter-spacing:-.7px;margin:3px 0}.subtitle{color:var(--muted);font-size:12px}.pill{font-size:12px;border:1px solid #d6e2f1;border-radius:99px;padding:6px 11px;background:#fff;color:#4e6686;white-space:nowrap}
+    .intro{background:linear-gradient(120deg,#142640,#294b83);color:white;border-radius:19px;padding:23px 27px;margin-bottom:19px;display:flex;justify-content:space-between;gap:15px;align-items:center}.intro h2{font-size:20px;line-height:1.3;margin:0 0 5px}.intro p{color:#c9d6ed;margin:0;max-width:750px}.intro .tag{background:#ffffff17;border:1px solid #ffffff25;border-radius:11px;color:#eaf0ff;padding:8px 12px;white-space:nowrap;font-size:12px}
+    .layout{display:grid;grid-template-columns:minmax(305px,355px) minmax(0,1fr);gap:20px;align-items:start}.stack{display:grid;gap:16px}.card{background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:20px;min-width:0}.card-head{display:flex;align-items:center;gap:10px;margin-bottom:7px}.step{display:grid;place-items:center;width:26px;height:26px;background:var(--blue-light);color:var(--blue);font-weight:800;font-size:12px;border-radius:9px}.card h3{font-size:15px;letter-spacing:-.2px;margin:0}.hint{color:var(--muted);font-size:12px;margin:5px 0 13px}.dropzone{border:1.6px dashed #b7c9e5;border-radius:12px;background:#f8fbff;text-align:center;padding:24px 13px;cursor:pointer;transition:.17s}.dropzone:hover,.dropzone.drag{border-color:var(--blue);background:#edf3ff}.dropzone .big{font-size:24px;color:var(--blue);display:block;line-height:1.2}.dropzone strong{display:block;font-size:13px;margin:9px 0 3px}.dropzone small{display:block;color:var(--muted)}.button{border:0;background:var(--blue);color:white;padding:10px 14px;border-radius:10px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;gap:6px;transition:.15s}.button:hover:not(:disabled){background:#174ac4}.button.secondary{background:#edf2fb;color:#2e557d}.button.secondary:hover:not(:disabled){background:#e0e9f8}.button.ghost{background:#fff;color:#49617d;border:1px solid var(--line)}.button.ghost:hover:not(:disabled){background:#f5f8fc}.button.sm{padding:7px 10px;font-size:12px}.button.full{width:100%}.flex{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.meta{background:#f3f7fd;border-radius:10px;font-size:12px;color:#566d88;padding:10px 12px;margin-top:11px;overflow-wrap:anywhere}.label{font-size:12px;font-weight:750;color:#405570;display:block;margin:10px 0 5px}textarea{width:100%;min-height:150px;max-height:340px;resize:vertical;border:1px solid #d4e0ef;border-radius:10px;padding:11px;background:#fbfdff;outline:none;color:var(--ink);font-family:ui-monospace,Consolas,monospace;font-size:12px;line-height:1.55}textarea:focus,input:focus,select:focus{border-color:var(--blue);outline:2px solid #d4e2ff}.divider{height:1px;background:var(--line);margin:15px 0}.file-label{position:relative;overflow:hidden}.hide{display:none!important}input[type=file]{display:none}.note-small{color:var(--muted);font-size:11px;margin:9px 0 0}.statusrow{display:flex;align-items:center;gap:9px;color:#60748f;font-size:12px}.dot{height:8px;width:8px;background:#b1bfd1;border-radius:100%;flex-shrink:0}.dot.on{background:var(--blue);animation:pulse 1.5s infinite}.dot.done{background:#20a579}.dot.bad{background:#c7585b}@keyframes pulse{50%{opacity:.3}}progress{width:100%;height:6px;border:0;accent-color:var(--blue);margin-top:9px}progress::-webkit-progress-bar{background:#edf2f8;border-radius:7px}progress::-webkit-progress-value{background:var(--blue);border-radius:7px}
+    .stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:11px;margin-bottom:16px}.stat{border:1px solid var(--line);background:#fff;border-radius:14px;padding:14px 15px;min-width:0}.stat .label{font-size:11px;color:var(--muted);font-weight:600;margin:0}.stat .number{font-size:22px;font-weight:850;letter-spacing:-.6px;line-height:1.35;margin-top:4px;font-variant-numeric:tabular-nums}.stat .caption{font-size:10px;color:#8b99ac;margin-top:3px}.result-card{padding:0;overflow:hidden}.result-head{padding:18px 20px 13px;border-bottom:1px solid var(--line)}.result-head h3{font-size:17px}.filters{display:flex;gap:9px;justify-content:space-between;align-items:center;flex-wrap:wrap;margin-top:13px}.search{flex:1;min-width:170px;padding:10px 12px;border-radius:10px;border:1px solid #d5e0ec;outline:none;background:#fafcff}.filter{background:#fff;border:1px solid #d5e0ec;border-radius:10px;padding:10px 12px;color:#4a5b74;max-width:220px}.scroll{overflow:auto;max-height:64vh}table{width:100%;border-collapse:collapse;text-align:left;white-space:nowrap}th{position:sticky;top:0;background:#f9fbfe;font-size:10px;text-transform:uppercase;letter-spacing:.055em;color:#70829b;z-index:2;border-bottom:1px solid var(--line)}td,th{padding:13px 13px}tr{border-bottom:1px solid #ebeff5}tbody tr.item:hover{background:#fafdff}td{font-size:12px;vertical-align:top}td .sub{font-size:11px;color:#7b8da3;margin-top:3px}.numbercell{font-variant-numeric:tabular-nums;text-align:right}.nowrap{white-space:nowrap}.truncate{max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.badge{display:inline-block;border-radius:6px;padding:3px 7px;font-size:11px;font-weight:750;white-space:normal;max-width:210px}.badge.boleto{color:#795211;background:#fff2d8}.badge.ok{color:#176d57;background:#ddf8ed}.badge.none{color:#7e5963;background:#f9e9ee}.badge.neutral{color:#526a89;background:#edf2f8}.details-btn{border:1px solid #d7e2f1;background:#fff;color:var(--blue);border-radius:8px;padding:6px 9px;font-size:11px;font-weight:800}.details-btn:hover{background:#f0f5ff}.details-row td{padding:0;background:#f9fbff}.details{padding:17px 19px 20px;white-space:normal;border-left:3px solid #a9bee9}.detail-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.details h4{color:#3d526e;font-size:12px;margin:0 0 7px}.details .mini{width:100%;white-space:normal;border:1px solid #e2eaf4;background:#fff;border-radius:8px;overflow:hidden}.mini th{position:static}.mini th,.mini td{padding:7px 9px;text-align:left;font-size:11px}.mini td.num{text-align:right}.mono{font-family:ui-monospace,Consolas,monospace;font-size:11px;overflow-wrap:anywhere;white-space:normal}.note{font-size:12px;color:#73849b}.foot{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;padding:15px 20px;border-top:1px solid var(--line);font-size:11px;color:var(--muted)}.empty{text-align:center;padding:75px 16px;color:#72839d}.empty .ico{font-size:35px;opacity:.8}.empty strong{display:block;color:#334860;margin:13px 0 5px;font-size:14px}.logbox{max-height:135px;overflow:auto;margin-top:11px;background:#f7f9fd;border:1px solid #e3eaf3;padding:9px 10px;border-radius:9px;font-size:11px;color:#53687e}.logbox div{margin:0 0 5px}.logbox .err{color:var(--danger)}.disclaimer{margin-top:15px;color:#6d7b8f;font-size:11px;line-height:1.65}.warnline{color:#8e5b20;padding:8px 11px;background:#fff7e9;border:1px solid #ffe7c0;border-radius:9px;font-size:12px;word-break:break-word;margin-top:10px}
+    @media(max-width:1050px){.layout{grid-template-columns:300px minmax(0,1fr)}.stats{grid-template-columns:repeat(2,1fr)}.detail-grid{grid-template-columns:1fr}}@media(max-width:740px){.shell{padding:14px 12px 35px}.layout{grid-template-columns:1fr}header{align-items:flex-start}.intro{padding:19px;flex-wrap:wrap}.intro h2{font-size:18px}.stats{grid-template-columns:repeat(2,1fr)}.stat .number{font-size:18px}.card{padding:17px}.result-card{padding:0}.scroll{max-height:70vh}.pill{display:none}}
+  </style>
+</head>
+<body>
+<div class="shell">
+  <header>
+    <div class="brand"><div class="mark">N<span style="font-size:13px">55</span></div><div><div class="eyebrow">Conferência fiscal</div><h1>Analisador de pagamentos NF-e</h1><div class="subtitle">DANFE / NF-e modelo 55 · Leitura e cruzamento de XMLs</div></div></div>
+    <div class="pill">100% local · Nenhum XML é enviado</div>
+  </header>
+  <section class="intro"><div><h2>Identifique como cada nota será paga.</h2><p>Importe notas por seleção ou arraste arquivos, busque chaves de acesso em pastas locais e abra o DANFE em PDF correspondente. Consulte meios, valores e vencimentos registrados nos XMLs.</p></div><div class="tag">XML NF-e 4.00 + versões anteriores</div></section>
+  <main class="layout">
+    <aside class="stack">
+      <section class="card">
+        <div class="card-head"><span class="step">01</span><h3>Importar notas XML</h3></div>
+        <p class="hint">Selecione ou arraste vários XMLs; PDFs com o nome da chave também serão associados automaticamente.</p>
+        <div id="dropZone" class="dropzone" role="button" tabindex="0" aria-label="Selecionar ou arrastar XMLs e PDFs"><span class="big">⇧</span><strong>Arraste arquivos XML e PDF aqui</strong><small>ou clique para selecionar múltiplos arquivos</small></div>
+        <input type="file" id="directFiles" accept=".xml,.pdf,text/xml,application/xml,application/pdf" multiple />
+        <div id="directMeta" class="meta">Nenhum XML importado ainda.</div>
+      </section>
+      <section class="card">
+        <div class="card-head"><span class="step">02</span><h3>Localizar notas por chave</h3></div>
+        <p class="hint">Selecione a pasta com os XMLs e os DANFEs em PDF. A pesquisa inclui todas as subpastas.</p>
+        <button class="button secondary full" id="chooseFolder" type="button">▤ &nbsp; Selecionar diretório de XMLs e PDFs</button>
+        <input type="file" id="folderInput" webkitdirectory directory multiple />
+        <div id="folderMeta" class="meta">Nenhum diretório selecionado.</div>
+        <div class="divider"></div>
+        <div class="flex" style="justify-content:space-between"><label class="label" style="margin:0" for="keysText">Chaves de acesso (44 dígitos, uma por linha)</label><label for="txtFile" class="button ghost sm file-label">Importar TXT</label></div>
+        <input type="file" id="txtFile" accept=".txt,text/plain" />
+        <textarea id="keysText" spellcheck="false" placeholder="35261012345678000123550010000001231000001234&#10;35261012345678000123550010000001241000001230"></textarea>
+        <div class="flex" style="margin-top:10px"><button id="searchKeys" class="button" style="flex:1">Buscar XMLs pelas chaves</button><button id="clearKeys" class="button ghost sm" title="Limpar somente as chaves">Limpar</button></div>
+        <p class="note-small">A busca procura XMLs por chave e também associa o PDF cujo nome contém a mesma chave de 44 dígitos (ex.: 3526...1234.pdf). Clique em “Abrir PDF” na nota correspondente.</p>
+      </section>
+      <section class="card">
+        <div class="card-head"><span class="step">03</span><h3>Pesquisar pelo número da NF-e</h3></div>
+        <p class="hint">Informe somente o número da nota (campo <code>ide/nNF</code>, até 9 dígitos). A busca verifica todos os XMLs da pasta selecionada, inclusive subpastas, mesmo quando o arquivo tem o nome da chave de 44 dígitos.</p>
+        <label class="label" for="noteNumber">Número da nota fiscal (NF / DANFE)</label>
+        <input id="noteNumber" type="text" inputmode="numeric" maxlength="9" autocomplete="off" class="search" style="width:100%" placeholder="Ex.: 12345" aria-label="Número individual da nota fiscal" />
+        <div class="flex" style="margin-top:11px"><button id="searchNumber" type="button" class="button" style="flex:1">Buscar pelo número</button><button id="clearNumber" type="button" class="button ghost sm" title="Remover o filtro por número e mostrar todas as notas carregadas">Mostrar todas</button></div>
+        <div class="meta" id="numberMeta">Também encontra notas com o mesmo número, mas emitentes, séries ou chaves diferentes. O número é comparado de forma exata.</div>
+      </section>
+      <section class="card">
+        <div class="card-head"><span class="step">04</span><h3>Andamento e controle</h3></div>
+        <div class="statusrow"><span class="dot" id="statusDot"></span><span id="statusText">Pronto para analisar arquivos.</span></div>
+        <progress id="progressBar" max="100" value="0"></progress>
+        <div class="flex" style="margin-top:13px"><button id="cancelBtn" class="button ghost sm" disabled>Interromper leitura</button><button id="resetBtn" class="button ghost sm">Limpar resultados</button></div>
+        <div id="missingWrap" class="warnline hide"><strong id="missingCount"></strong><div class="flex" style="margin-top:6px"><button id="downloadMissing" class="button ghost sm">Exportar não localizadas (.txt)</button></div></div>
+        <div class="logbox" id="logBox" aria-live="polite"><div>Os eventos da análise aparecerão aqui.</div></div>
+      </section>
+    </aside>
+    <section>
+      <div class="stats">
+        <div class="stat"><div class="label">NF-e analisadas</div><div class="number" id="statNotes">0</div><div class="caption">Chaves distintas</div></div>
+        <div class="stat"><div class="label">Valor total das notas</div><div class="number" id="statValue">R$ 0,00</div><div class="caption">Somatório dos vNF</div></div>
+        <div class="stat"><div class="label">Notas com boleto</div><div class="number" id="statBoletos">0</div><div class="caption">Pagamento tPag 15</div></div>
+        <div class="stat"><div class="label">Parcelas declaradas</div><div class="number" id="statInstallments">0</div><div class="caption">Duplicatas no grupo cobr</div></div>
+      </div>
+      <section class="card result-card">
+        <div class="result-head">
+          <div class="flex" style="justify-content:space-between"><h3>Resultado consolidado</h3><div class="flex"><button id="csvNotes" class="button secondary sm" disabled>Exportar notas CSV</button><button id="csvInstallments" class="button secondary sm" disabled>Exportar parcelas CSV</button></div></div>
+          <div class="filters"><input id="filterText" class="search" type="search" placeholder="Filtrar por chave, NF, emitente ou destinatário..." aria-label="Filtrar notas" /><select id="filterType" class="filter" aria-label="Filtrar por meio de pagamento"><option value="all">Todos os pagamentos</option><option value="boleto">Somente boletos</option><option value="parcelas">Com parcelas</option><option value="other">Sem boleto</option><option value="noinfo">Sem meio informado</option><option value="pdf">Com DANFE PDF</option><option value="nopdf">Sem DANFE PDF</option></select></div>
+        </div>
+        <div class="scroll"><table><thead><tr><th>Emissão / NF-e</th><th>Emitente</th><th>Destinatário</th><th class="numbercell">Valor NF-e</th><th>Pagamento declarado</th><th class="numbercell">Parcelas</th><th>DANFE PDF</th><th>Detalhes</th></tr></thead><tbody id="resultBody"></tbody></table><div id="emptyState" class="empty"><div class="ico">▧</div><strong>Nenhuma nota fiscal analisada</strong><span>Arraste arquivos XML ou procure notas usando as chaves de acesso.</span></div></div>
+        <div class="foot"><span id="tableCount">0 notas exibidas</span><div class="flex"><button id="prevPage" type="button" class="button ghost sm" disabled>Anterior</button><span id="pageLabel">Página 1 / 1</span><button id="nextPage" type="button" class="button ghost sm" disabled>Próxima</button></div></div>
+      </section>
+      <div class="disclaimer"><strong>Interpretação:</strong> “Boleto bancário” somente quando o XML declarar <code>tPag=15</code>. Parcelas são extraídas de <code>cobr/dup</code> e podem representar duplicatas sem comprovar a emissão de boletos. A NF-e, isoladamente, não comprova quitação, existência de título bancário ou ausência de cancelamento posterior. Os PDFs são abertos somente mediante clique e usam arquivos locais selecionados, sem upload. Documentos e chaves são processados exclusivamente no navegador.</div>
+    </section>
+  </main>
+</div>
+<script>
+'use strict';
+(() => {
+  const $ = id => document.getElementById(id);
+  const notes = new Map();
+  const expanded = new Set();
+  const foundKeys = new Set();
+  const missingKeys = new Set();
+  // Restrição opcional de exibição da busca por número, independente das chaves.
+  let activeInvoiceNumber = null;
+  // Armazena apenas o nNF encontrado em cada File; não retém conteúdos XML em memória.
+  const scannedNumbers = new WeakMap();
+  let folderFiles = [];
+  let folderIndex = new Map();
+  let folderPdfIndex = new Map();
+  let directPdfIndex = new Map();
+  let unindexedFiles = [];
+  let directCount = 0;
+  let directPdfCount = 0;
+  let pageIndex = 0;
+  const PAGE_SIZE = 100;
+  let session = 0;
+  let running = false;
+  const FILE_LIMIT = 30 * 1024 * 1024;
+  const PAYMENT_LABELS = {
+    '01':'Dinheiro','02':'Cheque','03':'Cartão de crédito','04':'Cartão de débito',
+    '05':'Cartão da loja / crediário','10':'Vale-alimentação','11':'Vale-refeição',
+    '12':'Vale-presente','13':'Vale-combustível','14':'Duplicata mercantil',
+    '15':'Boleto bancário','16':'Depósito bancário',
+    '17':'PIX (dinâmico)','18':'TED / transferência bancária',
+    '19':'Fidelidade / cashback / crédito virtual','20':'PIX (estático)',
+    '21':'Crédito em loja','22':'Pagamento eletrônico não informado',
+    '23':'PIX automático','24':'TEF / Book Transfer','90':'Sem pagamento',
+    '91':'Pagamento posterior','99':'Outros'
+  };
+  const fmtMoney = n => new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(Number.isFinite(n) ? n : 0);
+  const fmtInt = n => new Intl.NumberFormat('pt-BR').format(n);
+  const safe = value => String(value ?? '').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const round = n => Math.round((n + Number.EPSILON)*100)/100;
+  const price = str => { const x = Number(String(str??'').replace(',','.'));return Number.isFinite(x) ? x : 0; };
+  const xmlName = name => /\.xml$/i.test(name);
+  const pdfName = name => /\.pdf$/i.test(name);
+  const clean = str => String(str??'').trim();
+  const localName = node => node?.localName || String(node?.nodeName||'').split(':').pop();
+  const child = (node,name) => node ? Array.from(node.children||[]).find(n=>localName(n)===name)||null : null;
+  const children = (node,name) => node ? Array.from(node.children||[]).filter(n=>localName(n)===name) : [];
+  const at = (node,...names) => names.reduce((acc,n)=>child(acc,n),node);
+  const val = (node,...names) => clean(at(node,...names)?.textContent);
+  const fallback = (a,b) => a || b;
+  function formatDate(raw){
+    if(!raw)return '—';
+    const match = String(raw).match(/^(\d{4})-(\d{2})-(\d{2})/);
+    return match ? `${match[3]}/${match[2]}/${match[1]}` : String(raw);
+  }
+  function log(message,error=false){
+    const item=document.createElement('div');item.textContent=`${new Date().toLocaleTimeString('pt-BR')} · ${message}`;
+    if(error)item.className='err';$('logBox').prepend(item);
+    while($('logBox').children.length>65)$('logBox').lastElementChild.remove();
+  }
+  function status(message,kind='idle',value=null){
+    $('statusText').textContent=message;
+    $('statusDot').className='dot '+(kind==='busy'?'on':kind==='done'?'done':kind==='error'?'bad':'');
+    if(value!==null)$('progressBar').value=Math.max(0,Math.min(100,value));
+  }
+  function start(message){session++;running=true;$('cancelBtn').disabled=false;status(message,'busy',0);return session;}
+  function finish(token,message){if(token!==session)return;running=false;$('cancelBtn').disabled=true;status(message,'done',100);render();}
+  function canceled(token){return token!==session;}
+  const yieldUI=()=>new Promise(resolve=>setTimeout(resolve,0));
+  function getKeyFromName(name){const m=String(name).match(/(?:^|\D)(\d{44})(?!\d)/);return m?m[1]:null;}
+  const filePath = file => file?.webkitRelativePath || file?.relativePath || file?.name || '';
+  const parentPath = path => String(path||'').replace(/\\/g,'/').split('/').slice(0,-1).join('/').toLowerCase();
+  function buildPdfIndex(files){
+    const index = new Map();
+    for(const f of files){
+      if(!pdfName(f.name))continue;
+      const key=getKeyFromName(f.name);
+      if(!key)continue;
+      if(!index.has(key))index.set(key,[]);
+      index.get(key).push(f);
+    }
+    return index;
+  }
+  function addDirectPdfs(files){
+    let added=0;
+    for(const f of files){
+      if(!pdfName(f.name))continue;
+      const key=getKeyFromName(f.name);
+      if(!key){log(`PDF sem chave de 44 dígitos no nome: ${f.name}`,true);continue;}
+      if(!directPdfIndex.has(key))directPdfIndex.set(key,[]);
+      // Reimportar um arquivo com o mesmo caminho substitui sua referência.
+      const bucket=directPdfIndex.get(key);
+      const idx=bucket.findIndex(old=>filePath(old)===filePath(f));
+      if(idx>=0)bucket[idx]=f;
+      else {bucket.push(f);directPdfCount++;}
+      added++;
+    }
+    return added;
+  }
+  function findPdf(note){
+    if(!note)return null;
+    const files=[...(folderPdfIndex.get(note.key)||[]),...(directPdfIndex.get(note.key)||[])];
+    if(!files.length)return null;
+    const xmlFolders=new Set((note.files||[]).map(parentPath));
+    let best=files[0],bestScore=-1;
+    for(const pdf of files){
+      const score=(xmlFolders.has(parentPath(filePath(pdf)))?100:0)
+        +(pdf.name.toLowerCase()===`${note.key}.pdf`?10:0);
+      if(score>bestScore){best=pdf;bestScore=score;}
+    }
+    return best;
+  }
+  function openPdf(key){
+    const note=notes.get(key);
+    const pdf=findPdf(note);
+    if(!pdf){log(`PDF correspondente à chave ${key} não disponível. Selecione a pasta que contém o PDF.`,true);return;}
+    // O URL blob é gerado localmente e aberto após um clique do usuário.
+    const url=URL.createObjectURL(pdf);
+    const link=document.createElement('a');
+    link.href=url;link.target='_blank';link.rel='noopener noreferrer';link.type='application/pdf';
+    link.setAttribute('aria-label',`Abrir DANFE ${key} em PDF`);
+    document.body.appendChild(link);
+    link.click();link.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),300000);
+    log(`DANFE aberto: ${filePath(pdf)}`);
+  }
+  function parseKeys(text){
+    const keys=new Set();let invalid=0,duplicates=0;
+    for(const row of String(text).split(/\r?\n/)){
+      const line=row.trim();if(!line)continue;
+      const matches=[...line.matchAll(/(?:^|\D)(\d{44})(?!\d)/g)].map(m=>m[1]);
+      if(matches.length!==1){invalid++;continue;}
+      if(keys.has(matches[0]))duplicates++; else keys.add(matches[0]);
+    }
+    return {keys,invalid,duplicates};
+  }
+  function parseNfeXml(xmlText){
+    if(/<!DOCTYPE\b|<!ENTITY\b/i.test(xmlText))throw new Error('Declaração DTD/ENTITY não permitida.');
+    const doc=new DOMParser().parseFromString(xmlText,'application/xml');
+    if(doc.getElementsByTagName('parsererror').length || doc.getElementsByTagNameNS('*','parsererror').length)throw new Error('XML inválido ou malformado.');
+    const nfe=Array.from(doc.getElementsByTagName('*')).find(n=>localName(n)==='NFe');
+    const inf=child(nfe,'infNFe');
+    if(!inf)throw new Error('Documento não contém a estrutura NFe/infNFe.');
+    const model=val(inf,'ide','mod');
+    if(model!=='55')throw new Error(`Documento modelo ${model||'?'}: somente modelo 55 é aceito.`);
+    let key=(inf.getAttribute('Id')||'').match(/^NFe(\d{44})$/i)?.[1] || '';
+    if(!key){
+      const prot=Array.from(doc.getElementsByTagName('*')).find(n=>localName(n)==='protNFe');
+      key=val(prot,'infProt','chNFe');
+    }
+    if(!/^\d{44}$/.test(key))throw new Error('Chave NF-e (44 dígitos) não encontrada.');
+    const emit=child(inf,'emit'),dest=child(inf,'dest'),ide=child(inf,'ide');
+    const pag=child(inf,'pag'),cobr=child(inf,'cobr'),fat=child(cobr,'fat');
+    let details=children(pag,'detPag');
+    if(!details.length && child(pag,'tPag'))details=[pag];
+    const payments=details.map(p=>{
+      const cod=val(p,'tPag'),other=val(p,'xPag'),n=val(p,'vPag');
+      return {code:cod,label:PAYMENT_LABELS[cod] || (cod?'Código '+cod:'Não informado'),other,
+        amount:n===''?null:price(n),indicator:val(p,'indPag'),date:val(p,'dPag')};
+    }).filter(p=>p.code || p.amount!==null);
+    const installments=children(cobr,'dup').map((d,i)=>({number:val(d,'nDup')||String(i+1),due:val(d,'dVenc'),amount:price(val(d,'vDup'))}));
+    const infProt=Array.from(doc.getElementsByTagName('*')).find(n=>localName(n)==='infProt');
+    const stat=val(infProt,'cStat');
+    return {
+      key,model,number:val(ide,'nNF'),series:val(ide,'serie'),issued:fallback(val(ide,'dhEmi'),val(ide,'dEmi')),
+      emit:fallback(val(emit,'xNome'),val(emit,'xFant')),emitTax:fallback(val(emit,'CNPJ'),val(emit,'CPF')),
+      dest:fallback(val(dest,'xNome'),'Não informado'),destTax:fallback(val(dest,'CNPJ'),val(dest,'CPF')),
+      total:price(val(inf,'total','ICMSTot','vNF')),payments,installments,
+      indPag:val(ide,'indPag'),
+      fat:{number:val(fat,'nFat'),original:val(fat,'vOrig'),discount:val(fat,'vDesc'),net:val(fat,'vLiq')},
+      change:val(pag,'vTroco'),authorization:stat,files:[]
+    };
+  }
+  function register(note, file){
+    const path=file.webkitRelativePath||file.relativePath||file.name;
+    const prev=notes.get(note.key);
+    if(prev){
+      const files=new Set([...(prev.files||[]),path]);
+      const score=x=>x.payments.length*2+x.installments.length*2+(x.authorization==='100'?2:0);
+      if(score(note)>score(prev)){note.files=[...files];notes.set(note.key,note);}else{prev.files=[...files];}
+    }else{note.files=[path];notes.set(note.key,note);}
+    foundKeys.add(note.key);
+  }
+  async function readNote(file){
+    if(file.size>FILE_LIMIT)throw new Error(`XML acima do limite de ${Math.round(FILE_LIMIT/1024/1024)} MB.`);
+    return parseNfeXml(await file.text());
+  }
+  async function workerPool(items, worker, token, limit=5){
+    let idx=0,done=0;
+    const jobs=Array.from({length:Math.min(limit,items.length)},async()=>{
+      while(idx<items.length&&!canceled(token)){
+        const i=idx++,item=items[i];
+        await worker(item,i);
+        done++;
+        if(done%12===0 || done===items.length){
+          status(`Processando ${fmtInt(done)} de ${fmtInt(items.length)} XMLs...`,'busy',Math.floor(done/items.length*100));
+          if(done%48===0){render();await yieldUI();}
+        }
+      }
+    });
+    await Promise.all(jobs);
+    return done;
+  }
+  async function importFiles(fileArray){
+    const selected=Array.from(fileArray||[]);
+    const pdfAdded=addDirectPdfs(selected);
+    const files=selected.filter(f=>xmlName(f.name));
+    if(!files.length){
+      if(pdfAdded){log(`${fmtInt(pdfAdded)} PDF(s) associado(s) por chave. Se a nota já está carregada, o botão Abrir PDF foi habilitado.`);render();}
+      else log('Nenhum arquivo XML ou PDF válido na seleção.',true);
+      $('directMeta').textContent=`${fmtInt(directCount)} arquivo(s) XML aceito(s) · ${fmtInt(directPdfCount)} PDF(s) selecionado(s) · ${fmtInt(notes.size)} nota(s).`;
+      return;
+    }
+    const token=start(`Importando ${fmtInt(files.length)} XML(s)...`);
+    let success=0,issues=0;
+    await workerPool(files,async file=>{
+      try { const note=await readNote(file);if(canceled(token))return;register(note,file);success++; }
+      catch(e){issues++;if(issues<=12)log(`${file.name}: ${e.message}`,true);}
+    },token,5);
+    if(canceled(token))return;
+    directCount+=success;
+    $('directMeta').textContent=`${fmtInt(directCount)} arquivo(s) XML aceito(s) · ${fmtInt(directPdfCount)} PDF(s) selecionado(s) · ${fmtInt(notes.size)} nota(s).`;
+    log(`Importação: ${fmtInt(success)} XML(s) aceito(s), ${fmtInt(issues)} ignorado(s).`);
+    finish(token,`Importação concluída: ${fmtInt(success)} XML(s) NF-e.`);
+  }
+  function setFolder(files){
+    if(running){session++;running=false;$('cancelBtn').disabled=true;}
+    const selected=Array.from(files);
+    folderFiles=selected.filter(f=>xmlName(f.name));
+    folderPdfIndex=buildPdfIndex(selected);
+    const pdfCount=selected.filter(f=>pdfName(f.name)).length;
+    folderIndex=new Map();unindexedFiles=[];
+    for(const f of folderFiles){
+      const key=getKeyFromName(f.name);
+      if(key){if(!folderIndex.has(key))folderIndex.set(key,[]);folderIndex.get(key).push(f);}
+      else unindexedFiles.push(f);
+    }
+    const one=folderFiles[0]?.webkitRelativePath||folderFiles[0]?.relativePath||'';
+    const root=one.includes('/')?one.split('/')[0]:'Pasta selecionada';
+    $('folderMeta').textContent=selected.length ? `${root} · ${fmtInt(folderFiles.length)} XML(s) · ${fmtInt(pdfCount)} PDF(s) · ${fmtInt(folderPdfIndex.size)} PDF(s) com chave reconhecida · ${fmtInt(unindexedFiles.length)} XML(s) para conferência por conteúdo.` : 'Diretório vazio.';
+    log(`Pasta indexada: ${fmtInt(folderFiles.length)} XML(s) e ${fmtInt(pdfCount)} PDF(s), incluindo subpastas.`);
+    status('Diretório selecionado. Os PDFs correspondentes já podem ser abertos; para carregar novas notas, pesquise as chaves.','done',0);
+    render();
+  }
+  async function searchKeys(){
+    const {keys,invalid,duplicates}=parseKeys($('keysText').value);
+    if(!keys.size){log('Cole ou carregue ao menos uma chave de 44 dígitos.',true);status('Nenhuma chave válida para pesquisar.','error',0);return;}
+    if(!folderFiles.length){log('Selecione primeiro um diretório com arquivos XML.',true);status('Diretório não selecionado.','error',0);return;}
+    if(invalid || duplicates)log(`Lista: ${invalid} linha(s) inválida(s) e ${duplicates} chave(s) repetida(s) ignoradas.`);
+    const wanted=new Set(keys);
+    const pending=new Set([...wanted].filter(k=>!notes.has(k)));
+    missingKeys.clear();
+    const token=start(`Buscando ${fmtInt(keys.size)} chaves...`);
+    let checked=0,errors=0,indexHits=0,contentHits=0;
+    // Emite resultados por chave já importados e prioriza nomes de arquivos.
+    const candidates=[];
+    for(const key of pending){ for(const file of folderIndex.get(key)||[])candidates.push({file,key}); }
+    status(`Conferindo ${fmtInt(candidates.length)} XML(s) indexado(s) por nome...`,'busy',5);
+    for(const {file,key} of candidates){
+      if(canceled(token))return;
+      try{const note=await readNote(file);if(note.key===key){register(note,file);pending.delete(key);indexHits++;}}
+      catch(e){errors++;if(errors<=8)log(`${file.name}: ${e.message}`,true);}
+      checked++;
+      if(checked%35===0){status(`Conferindo arquivos por nome: ${checked}/${candidates.length}`,'busy',Math.min(35,Math.floor(checked/Math.max(1,candidates.length)*35)));await yieldUI();}
+    }
+    if(pending.size){
+      // Checa também o conteúdo de XMLs cujo nome não declara a chave da NF-e.
+      const scan=unindexedFiles;
+      let i=0;
+      status(`${fmtInt(pending.size)} chave(s) ainda não encontrada(s). Analisando conteúdo de ${fmtInt(scan.length)} XML(s)...`,'busy',36);
+      // O laço é sequencial para parar imediatamente quando todas forem encontradas.
+      for(const file of scan){
+        if(canceled(token))return;
+        if(!pending.size)break;
+        try{
+          const note=await readNote(file);
+          if(pending.has(note.key)){register(note,file);pending.delete(note.key);contentHits++;}
+        }catch(e){errors++;}
+        i++;
+        if(i%40===0){status(`Pesquisa por conteúdo: ${fmtInt(i)}/${fmtInt(scan.length)} XML(s), ${fmtInt(pending.size)} chave(s) pendente(s).`,'busy',36+Math.floor(i/Math.max(1,scan.length)*62));if(i%200===0)render();await yieldUI();}
+      }
+    }
+    if(canceled(token))return;
+    for(const k of wanted)if(!notes.has(k))missingKeys.add(k);
+    log(`Busca: ${fmtInt(keys.size-missingKeys.size)} localizada(s) no conjunto, ${fmtInt(missingKeys.size)} não localizada(s). Por nome: ${indexHits}; por conteúdo: ${contentHits}.`);
+    if(errors)log(`${fmtInt(errors)} arquivo(s) com erro, incompatíveis ou inválidos durante a busca.`,true);
+    finish(token,`Pesquisa concluída. ${fmtInt(missingKeys.size)} chave(s) não localizada(s).`);
+  }
+  // nNF é um número decimal com até nove dígitos, sem dependência de CNPJ ou série.
+  function normalizeInvoiceNumber(raw){
+    const value=String(raw??'').trim();
+    return /^\d{1,9}$/.test(value) && /[1-9]/.test(value) ? value.replace(/^0+/,'') : null;
+  }
+  // Pré-filtro rápido: só os XMLs cujo nNF corresponde ao solicitado passam
+  // pelo DOMParser completo e são incorporados à relação consolidada.
+  function sniffInvoiceNumber(xml){
+    const m=xml.match(/<(?:[A-Za-z_][\w.-]*:)?nNF(?:\s[^>]*)?>\s*(\d+)\s*<\/(?:[A-Za-z_][\w.-]*:)?nNF\s*>/i);
+    return m ? String(m[1]).replace(/^0+/,'') || '0' : null;
+  }
+  async function searchByInvoiceNumber(){
+    const wanted=normalizeInvoiceNumber($('noteNumber').value);
+    if(!wanted){
+      log('Informe um número de nota válido, de 1 a 9 dígitos, maior que zero.',true);
+      status('Número de NF-e inválido.','error',0);$('noteNumber').focus();return;
+    }
+    if(!folderFiles.length && !notes.size){
+      log('Selecione uma pasta de XMLs ou importe arquivos XML para procurar pelo número.',true);
+      status('Selecione a pasta de XMLs antes de pesquisar.','error',0);return;
+    }
+    // A pesquisa por número independe dos filtros textuais ou de pagamento anteriores.
+    $('filterText').value='';$('filterType').value='all';
+    activeInvoiceNumber=wanted;pageIndex=0;
+    render();
+    if(!folderFiles.length){
+      const count=shownNotes().length;
+      $('numberMeta').textContent=`NF ${wanted}: ${fmtInt(count)} nota(s) já importada(s). Selecione uma pasta para procurar também nos XMLs ainda não carregados.`;
+      status(`Filtro exato da NF ${wanted} aplicado aos arquivos importados.`,'done',100);
+      return;
+    }
+    const token=start(`Procurando NF ${wanted} em ${fmtInt(folderFiles.length)} XML(s)...`);
+    let position=0,checked=0,matchedFiles=0,errors=0;
+    const concurrency=Math.min(6,folderFiles.length);
+    const workers=Array.from({length:concurrency},async()=>{
+      while(position<folderFiles.length && !canceled(token)){
+        const file=folderFiles[position++];
+        try{
+          if(file.size>FILE_LIMIT)throw new Error('Arquivo XML acima do limite de leitura.');
+          let detected=scannedNumbers.get(file);
+          let raw;
+          if(detected===undefined){
+            raw=await file.text();
+            detected=sniffInvoiceNumber(raw);
+            scannedNumbers.set(file,detected);
+          }
+          if(canceled(token))return;
+          if(detected===wanted){
+            if(raw===undefined)raw=await file.text();
+            const note=parseNfeXml(raw);
+            if(normalizeInvoiceNumber(note.number)===wanted){
+              register(note,file);matchedFiles++;
+            }
+          }
+        }catch(e){
+          errors++;
+          if(errors<=6)log(`Busca NF ${wanted} — ${file.name}: ${e.message}`,true);
+        }
+        checked++;
+        if(checked%40===0 || checked===folderFiles.length){
+          status(`NF ${wanted}: ${fmtInt(checked)} de ${fmtInt(folderFiles.length)} XML(s) verificados; ${fmtInt(matchedFiles)} arquivo(s) correspondente(s).`,'busy',Math.floor(100*checked/folderFiles.length));
+          if(checked%160===0)render();
+          await yieldUI();
+        }
+      }
+    });
+    await Promise.all(workers);
+    if(canceled(token))return;
+    const found=shownNotes().length;
+    $('numberMeta').textContent=`Número NF ${wanted}: ${fmtInt(found)} nota(s) distinta(s) exibida(s) e ${fmtInt(matchedFiles)} XML(s) correspondente(s) encontrado(s) na pasta.`;
+    log(`Busca por número NF ${wanted}: ${fmtInt(checked)} XML(s) verificados, ${fmtInt(matchedFiles)} arquivo(s) correspondente(s) e ${fmtInt(found)} nota(s) distinta(s) exibida(s).`);
+    if(errors)log(`${fmtInt(errors)} XML(s) não puderam ser lidos ou estavam inválidos.`,true);
+    finish(token,`Busca da NF ${wanted} concluída: ${fmtInt(found)} nota(s) exibida(s).`);
+  }
+  function clearInvoiceNumber(){
+    if(running){session++;running=false;$('cancelBtn').disabled=true;}
+    activeInvoiceNumber=null;
+    $('noteNumber').value='';
+    $('numberMeta').textContent='Filtro por número removido. Todas as notas importadas voltaram a ser exibidas.';
+    pageIndex=0;render();
+    status('Filtro por número removido.','done',100);
+  }
+  function payDisplay(note){
+    if(!note.payments.length)return '<span class="badge none">Não informado no XML</span>';
+    return note.payments.map(p=>{
+      const klass=p.code==='15'?'boleto':p.code==='90'||p.code==='91'?'neutral':'ok';
+      const name=p.code==='99'&&p.other?`Outros: ${p.other}`:p.label;
+      return `<span class="badge ${klass}" title="tPag ${safe(p.code)}">${safe(name)}</span>`;
+    }).join('<span style="display:inline-block;width:4px"></span>');
+  }
+  function mkDetail(note){
+    const rowsPay=note.payments.length?note.payments.map(p=>`<tr><td>${safe(p.code)}</td><td>${safe(p.code==='99'&&p.other?p.other:p.label)}${p.other&&p.code!=='99'?` (${safe(p.other)})`:''}</td><td>${safe(p.indicator==='0'?'À vista':p.indicator==='1'?'A prazo':p.indicator==='2'?'Outros':'—')}</td><td class="num">${p.amount===null?'—':fmtMoney(p.amount)}</td></tr>`).join(''):'<tr><td colspan="4">Nenhum detPag/tPag informado.</td></tr>';
+    const rowsDup=note.installments.length?note.installments.map(d=>`<tr><td>${safe(d.number)}</td><td>${safe(formatDate(d.due))}</td><td class="num">${fmtMoney(d.amount)}</td></tr>`).join(''):'<tr><td colspan="3">Nenhuma duplicata/parcelamento no grupo cobr/dup.</td></tr>';
+    const hasBoleto=note.payments.some(p=>p.code==='15');
+    const hasInstall=note.installments.length>0;
+    const caution=hasInstall&&!hasBoleto?'Há parcelas/duplicatas, mas o XML não declara tPag=15. Não foram classificadas como boletos.':hasBoleto&&!hasInstall?'O XML declara boleto, mas não contém datas/valores de parcelas em cobr/dup.':hasBoleto&&hasInstall?'O XML declara boleto e também contém parcelas. A associação individual entre cada boleto e cada duplicata não é garantida pelo XML.':'';
+    const pdf=findPdf(note);
+    const pdfDetail=pdf?`<div class="flex" style="margin-top:10px"><button type="button" class="button secondary sm" data-pdf-key="${safe(note.key)}">↗ Abrir DANFE em PDF</button><span class="mono">${safe(filePath(pdf))}</span></div>`
+      :'<div class="note" style="margin-top:10px">PDF não localizado. Selecione a pasta que contém o DANFE com a chave no nome.</div>';
+    const fat=note.fat.number||note.fat.original||note.fat.discount||note.fat.net?`<div class="note" style="margin-top:9px"><strong>Fatura:</strong> ${safe(note.fat.number||'—')} · Original: ${note.fat.original?fmtMoney(price(note.fat.original)):'—'} · Desconto: ${note.fat.discount?fmtMoney(price(note.fat.discount)):'—'} · Líquido: ${note.fat.net?fmtMoney(price(note.fat.net)):'—'}</div>`:'';
+    const totalInstall=note.installments.reduce((t,d)=>t+d.amount,0);
+    return `<div class="details"><div class="detail-grid"><div><h4>Formas de pagamento declaradas</h4><table class="mini"><thead><tr><th>tPag</th><th>Modalidade</th><th>Ind.</th><th>Valor</th></tr></thead><tbody>${rowsPay}</tbody></table>${note.change?`<div class="note">Troco informado: ${fmtMoney(price(note.change))}</div>`:''}</div><div><h4>Parcelas / duplicatas</h4><table class="mini"><thead><tr><th>Número</th><th>Vencimento</th><th>Valor</th></tr></thead><tbody>${rowsDup}</tbody></table>${hasInstall?`<div class="note" style="margin-top:7px">Total das parcelas: <strong>${fmtMoney(totalInstall)}</strong></div>`:''}${fat}</div></div>${caution?`<div class="warnline">${safe(caution)}</div>`:''}<div class="divider"></div><div class="note"><strong>Chave:</strong> <span class="mono">${safe(note.key)}</span> &nbsp; <strong>Emissão:</strong> ${safe(formatDate(note.issued))} &nbsp; <strong>Protocolo (cStat):</strong> ${safe(note.authorization||'não informado')} ${note.authorization==='100'?'(autorização registrada no XML)':''}<br><strong>Emitente:</strong> ${safe(note.emit)} · ${safe(note.emitTax||'CPF/CNPJ não informado')}<br><strong>Destinatário:</strong> ${safe(note.dest)} · ${safe(note.destTax||'CPF/CNPJ não informado')}<br><strong>Arquivo(s):</strong> ${note.files.map(x=>`<span class="mono">${safe(x)}</span>`).join(' · ')}${pdfDetail}</div></div>`;
+  }
+  function shownNotes(){
+    const q=$('filterText').value.toLocaleLowerCase('pt-BR').trim();
+    const type=$('filterType').value;
+    return [...notes.values()].filter(n=>{
+      if(activeInvoiceNumber!==null && normalizeInvoiceNumber(n.number)!==activeInvoiceNumber)return false;
+      const boleto=n.payments.some(p=>p.code==='15');
+      if(type==='boleto'&&!boleto)return false;
+      if(type==='other'&&boleto)return false;
+      if(type==='parcelas'&&!n.installments.length)return false;
+      if(type==='noinfo'&&n.payments.length)return false;
+      if(type==='pdf'&&!findPdf(n))return false;
+      if(type==='nopdf'&&findPdf(n))return false;
+      return !q || [n.key,n.number,n.series,n.emit,n.dest,n.emitTax,n.destTax,n.payments.map(p=>p.label).join(' ')].some(s=>String(s||'').toLocaleLowerCase('pt-BR').includes(q));
+    }).sort((a,b)=>(b.issued||'').localeCompare(a.issued||'')||(b.number||'').localeCompare(a.number||'',undefined,{numeric:true}));
+  }
+  function render(){
+    const all=[...notes.values()];
+    $('statNotes').textContent=fmtInt(all.length);
+    $('statValue').textContent=fmtMoney(all.reduce((s,n)=>s+n.total,0));
+    $('statBoletos').textContent=fmtInt(all.filter(n=>n.payments.some(p=>p.code==='15')).length);
+    $('statInstallments').textContent=fmtInt(all.reduce((s,n)=>s+n.installments.length,0));
+    $('csvNotes').disabled=!all.length;$('csvInstallments').disabled=!all.some(n=>n.installments.length);
+    $('missingWrap').classList.toggle('hide',missingKeys.size===0);
+    $('missingCount').textContent=`${fmtInt(missingKeys.size)} chave(s) não localizada(s)`;
+    const list=shownNotes();
+    const pages=Math.max(1,Math.ceil(list.length/PAGE_SIZE));
+    pageIndex=Math.min(pageIndex,pages-1);
+    const first=pageIndex*PAGE_SIZE;
+    const pageNotes=list.slice(first,first+PAGE_SIZE);
+    $('emptyState').classList.toggle('hide',list.length!==0);
+    $('emptyState').querySelector('strong').textContent=all.length?'Nenhuma nota corresponde ao filtro':'Nenhuma nota fiscal analisada';
+    $('emptyState').querySelector('span').textContent=all.length?'Altere os filtros para visualizar as notas carregadas.':'Arraste arquivos XML ou procure notas usando as chaves de acesso.';
+    $('resultBody').innerHTML=pageNotes.map(n=>{
+      const ext=expanded.has(n.key);
+      const pdf=findPdf(n);
+      const pdfCell=pdf?`<button class="details-btn pdf-btn" type="button" data-pdf-key="${safe(n.key)}" title="${safe(filePath(pdf))}">↗ Abrir PDF</button>`:'<span class="badge neutral" title="PDF com a mesma chave não foi localizado nas pastas selecionadas">Não localizado</span>';
+      return `<tr class="item"><td><strong>NF ${safe(n.number||'—')}</strong><div class="sub">Série ${safe(n.series||'—')} · ${safe(formatDate(n.issued))}</div></td><td><div class="truncate" title="${safe(n.emit)}">${safe(n.emit||'—')}</div><div class="sub">${safe(n.emitTax||'')}</div></td><td><div class="truncate" title="${safe(n.dest)}">${safe(n.dest||'—')}</div></td><td class="numbercell"><strong>${fmtMoney(n.total)}</strong></td><td>${payDisplay(n)}</td><td class="numbercell"><strong>${n.installments.length||'—'}</strong></td><td>${pdfCell}</td><td><button type="button" class="details-btn" data-key="${n.key}" aria-expanded="${ext}">${ext?'Ocultar':'Detalhes'}</button></td></tr>${ext?`<tr class="details-row"><td colspan="8">${mkDetail(n)}</td></tr>`:''}`;
+    }).join('');
+    const withPdf=all.filter(n=>findPdf(n)).length;
+    $('tableCount').textContent=list.length?`${fmtInt(first+1)}–${fmtInt(first+pageNotes.length)} de ${fmtInt(list.length)} nota(s) filtrada(s) · ${fmtInt(all.length)} analisada(s) · ${fmtInt(withPdf)} com PDF`:`0 notas exibidas · ${fmtInt(all.length)} analisada(s) · ${fmtInt(withPdf)} com PDF`;
+    $('pageLabel').textContent=`Página ${pageIndex+1} / ${pages}`;
+    $('prevPage').disabled=pageIndex===0;
+    $('nextPage').disabled=pageIndex+1>=pages;
+  }
+  function exportRows(name,headers,rows){
+    const csv=[headers,...rows].map(row=>row.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(';')).join('\r\n');
+    saveFile(name,'\uFEFF'+csv,'text/csv;charset=utf-8');
+  }
+  function saveFile(name,text,type){
+    const url=URL.createObjectURL(new Blob([text],{type}));
+    const a=document.createElement('a');a.href=url;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),2500);
+  }
+  function exportNotes(){
+    const h=['Chave NF-e','NF','Serie','Emissao','CNPJ/CPF emitente','Emitente','CNPJ/CPF destinatario','Destinatario','Valor NF-e','Codigos tPag','Formas de pagamento','Valores dos pagamentos','Qtd parcelas','Total parcelas','Numeros duplicatas','Vencimentos','Status protocolo','Arquivos'];
+    const rows=[...notes.values()].map(n=>[n.key,n.number,n.series,formatDate(n.issued),n.emitTax,n.emit,n.destTax,n.dest,numberCSV(n.total),n.payments.map(p=>p.code).join(' | '),n.payments.map(p=>p.code==='99'&&p.other?p.other:p.label).join(' | '),n.payments.map(p=>p.amount===null?'':numberCSV(p.amount)).join(' | '),n.installments.length,numberCSV(n.installments.reduce((s,d)=>s+d.amount,0)),n.installments.map(d=>d.number).join(' | '),n.installments.map(d=>formatDate(d.due)).join(' | '),n.authorization,n.files.join(' | ')]);
+    exportRows('nfe_pagamentos_resumo.csv',h,rows);
+  }
+  const numberCSV=n=>Number(n).toFixed(2).replace('.',',');
+  function exportInstallments(){
+    const h=['Chave NF-e','NF','Serie','Emissao','Emitente','Destinatario','Valor NF-e','Boleto informado (tPag 15)','Meios de pagamento','Numero parcela/duplicata','Vencimento','Valor parcela','Numero fatura','Arquivo'];
+    const rows=[];
+    for(const n of notes.values())for(const d of n.installments)rows.push([n.key,n.number,n.series,formatDate(n.issued),n.emit,n.dest,numberCSV(n.total),n.payments.some(p=>p.code==='15')?'SIM':'NAO',n.payments.map(p=>p.label).join(' | '),d.number,formatDate(d.due),numberCSV(d.amount),n.fat.number,n.files.join(' | ')]);
+    exportRows('nfe_parcelas_duplicatas.csv',h,rows);
+  }
+  function reset(){
+    session++;running=false;notes.clear();expanded.clear();foundKeys.clear();missingKeys.clear();directCount=0;directPdfCount=0;directPdfIndex.clear();
+    $('directFiles').value='';$('directMeta').textContent='Nenhum XML importado ainda.';
+    $('filterText').value='';$('filterType').value='all';pageIndex=0;$('cancelBtn').disabled=true;
+    activeInvoiceNumber=null;$('noteNumber').value='';
+    $('numberMeta').textContent='Também encontra notas com o mesmo número, mas emitentes, séries ou chaves diferentes. O número é comparado de forma exata.';
+    status('Resultados apagados. A pasta e as chaves permanecem selecionadas.','idle',0);
+    log('Relação de notas limpa.');render();
+  }
+  $('dropZone').addEventListener('click',()=>$('directFiles').click());
+  $('dropZone').addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();$('directFiles').click();}});
+  $('directFiles').addEventListener('change',e=>{importFiles(e.target.files);e.target.value='';});
+  $('dropZone').addEventListener('dragover',e=>{e.preventDefault();$('dropZone').classList.add('drag');});
+  $('dropZone').addEventListener('dragleave',e=>{e.preventDefault();$('dropZone').classList.remove('drag');});
+  $('dropZone').addEventListener('drop',e=>{e.preventDefault();$('dropZone').classList.remove('drag');importFiles(e.dataTransfer.files);});
+  $('chooseFolder').addEventListener('click',()=>$('folderInput').click());
+  $('folderInput').addEventListener('change',e=>setFolder(e.target.files));
+  $('txtFile').addEventListener('change',async e=>{
+    const file=e.target.files[0];if(!file)return;
+    if(file.size>10*1024*1024){log('TXT excede o limite de 10 MB.',true);return;}
+    try{$('keysText').value=(await file.text()).replace(/^\uFEFF/,'');const p=parseKeys($('keysText').value);log(`TXT importado: ${fmtInt(p.keys.size)} chave(s) válida(s).`);}catch(x){log('Falha ao ler TXT: '+x.message,true);}e.target.value='';
+  });
+  $('searchKeys').addEventListener('click',searchKeys);
+  $('searchNumber').addEventListener('click',searchByInvoiceNumber);
+  $('noteNumber').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();searchByInvoiceNumber();}});
+  $('clearNumber').addEventListener('click',clearInvoiceNumber);
+  $('clearKeys').addEventListener('click',()=>{$('keysText').value='';missingKeys.clear();render();});
+  $('filterText').addEventListener('input',()=>{pageIndex=0;render();});
+  $('filterType').addEventListener('change',()=>{pageIndex=0;render();});
+  $('prevPage').addEventListener('click',()=>{if(pageIndex>0){pageIndex--;render();}});
+  $('nextPage').addEventListener('click',()=>{pageIndex++;render();});
+  $('resultBody').addEventListener('click',e=>{
+    const pdfBtn=e.target.closest('button[data-pdf-key]');
+    if(pdfBtn){openPdf(pdfBtn.dataset.pdfKey);return;}
+    const btn=e.target.closest('button[data-key]');if(!btn)return;
+    const key=btn.dataset.key;
+    if(expanded.has(key))expanded.delete(key);else expanded.add(key);
+    render();
+  });
+  $('csvNotes').addEventListener('click',exportNotes);
+  $('csvInstallments').addEventListener('click',exportInstallments);
+  $('downloadMissing').addEventListener('click',()=>saveFile('chaves_nfe_nao_localizadas.txt',[...missingKeys].join('\r\n')+'\r\n','text/plain;charset=utf-8'));
+  $('cancelBtn').addEventListener('click',()=>{if(!running)return;session++;running=false;$('cancelBtn').disabled=true;status('Leitura interrompida. Os registros já processados foram preservados.','error',0);log('Processamento interrompido.');render();});
+  $('resetBtn').addEventListener('click',reset);
+  render();
+})();
+</script>
+</body>
+</html>
